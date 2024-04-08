@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from .forms import RegisterForm, LoginForm
+from django.shortcuts import redirect
+from django.contrib.auth.models import User
 
 def index(request):
     return HttpResponse("Hello, world. You're at the game index.")
@@ -19,11 +21,19 @@ def register(request):
             first_name = request.POST.get("first_name")
             last_name = request.POST.get("last_name")
             username = request.POST.get("username")
+            user = User.objects.create_user(username, email, password)
+            user.first_name = first_name
+            user.last_name = last_name
+            user.save()
+           
+
+            
             
             
             # Aquí deberíamos guardar el usuario en la base de datos:
-            
+
          
+
 
             
     else:
