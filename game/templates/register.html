@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form method="post">
+        {% csrf_token %}
+        
+        {% comment %} los campos del formulario son los mismos que hemos definido en el form.py, por lo que se deben llamar igual {% endcomment %}
+      <div class="form-group">
+        <div>
+            <label for="email">Email</label>
+            <input id="email" type="email" name="email" value="{{ email }}">
+        </div>
+        <div>
+            <label for="password">Password</label>
+            <input id="password" type="password" name="password" value="{{ password }}">
+        </div>
+        <div>
+            <label for="repeat_password">Confirm Password</label>
+            <input id="repeat_password" type="password" name="repeat_password" value="{{ repeat_password }}">
+        </div>
+        <div>
+            <label for="first_name">First Name</label>
+            <input id="first_name" type="text" name="first_name" value="{{ first_name }}">
+        </div>
+        <div>
+            <label for="last_name">Last Name</label>
+            <input id="last_name" type="text" name="last_name" value="{{ last_name }}">
+        </div>
+        <div>
+            <label for="username">Username</label>
+            <input id="username" type="text" name="username" value="{{ username }}">
+        </div>
+        <div>
+            <input type="submit" value="Register">
+        </div>
+    </form>
+   
+    
+</body>
+</html>
+
+
