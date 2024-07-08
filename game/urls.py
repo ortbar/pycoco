@@ -1,17 +1,23 @@
 from django.urls import path
+from django.conf.urls.static import static
+from django.conf import settings
 
 from . import views
 
 urlpatterns = [
-    path("", views.base, name="base"),
-    path("hello", views.hello, name="hello"),
+    
+    path("", views.login, name="login"),
     path("register", views.register, name="register"),
-    path("login", views.login, name="login"),
-    path("logout", views.logout, name="logout"),
+    path("index", views.index, name="index"),   
+    path("game", views.game, name="game"),
     path("estadisticas", views.estadisticas, name="estadisticas"),
-
+    path("logout", views.logout, name="logout"),
+    path("profile", views.profile, name="profile"),
     
 
     
     
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

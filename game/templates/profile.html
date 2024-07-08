@@ -1,0 +1,38 @@
+<!-- templates/profile.html -->
+{% extends "base.html" %}
+{% load static %}
+{% load custom_tags %}
+
+{% block title %}
+Editar Perfil - Pycoco
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="text-center mb-4">
+                {% if user.userprofile.avatar %}
+                    <img src="{{ user.userprofile.avatar.url }}" alt="{{ user.username }}" class="rounded-circle img-thumbnail" width="150">
+                {% else %}
+                    <img src="{% static 'default.jpg' %}" alt="{{ user.username }}" class="rounded-circle img-thumbnail" width="150">
+                {% endif %}
+            </div>
+            <form method="post" enctype="multipart/form-data" class="border rounded shadow-sm bg-light p-4">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="id_username" class="form-label">Nombre de usuario:</label>
+                    {{ form.username|add_class:"form-control" }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_avatar" class="form-label">Avatar:</label>
+                    {{ form.avatar|add_class:"form-control" }}
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

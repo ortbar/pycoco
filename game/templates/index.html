@@ -1,2 +1,25 @@
+<!-- templates/index.html -->
+{% extends "base.html" %}
 
-<p>index</p>
+{% block title %}
+Inicio - Pycoco
+{% endblock %}
+
+{% block content %}
+<div class="text-center">
+  {% if user.is_authenticated %}
+    <h2>¡Bienvenido, {{ user.username }}!</h2>
+  {% else %}
+    <h2>¡Bienvenido a Pycoco!</h2>
+  {% endif %}
+    <p>¿Estás listo para jugar?</p>
+    <a href="{% url 'game' %}" class="btn btn-primary">Jugar</a>
+</div>
+{% endblock %}
+
+
+
+
+
+
+

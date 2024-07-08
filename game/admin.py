@@ -6,3 +6,5 @@ admin.site.register(Game)
 admin.site.register(Riddle)
 admin.site.register(Match)
 
+
+
