@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static%}
+
+
+{% block title %}
+Juego de Acertijos
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="titulo">{{riddle.question}}</h1>
+    
+    {% if riddle %}
+    <div class="acertijo">
+        imagenes del acertijo
+        {% load static %}
+        <img src="{% static 'images/kamaron.webp' %}" alt="imagen1">  
+        <img src="{% static 'images/isla.jpg' %}" alt="imagen2">        
+    </div>
+    <p>{{riddle.clue}}</p>
+    {% comment %} formulario para escribir la respuesta  {% endcomment %}
+    <form action="">
+        {% csrf_token %}
+        <input type="text" name="answer" id="answer" placeholder="Escribe tu respuesta">
+        <input type="submit" value="Enviar">
+
+
+           
+            
+    {% endif %}
+
+    {%endblock %}
+        </div>
+    </div>
+

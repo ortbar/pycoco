@@ -11,3 +11,9 @@ def add_class(value, arg):
     css_classes = value.field.widget.attrs.get('class', '')
     css_classes += ' ' + arg
     return value.as_widget(attrs={'class': css_classes})
+
+# aplicar bootsttrap a game.html
+# {% extends "base.html" %}
+# {% load custom_tags %}
+
+

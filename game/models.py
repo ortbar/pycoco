@@ -1,3 +1,4 @@
+from asyncio.windows_events import NULL
 from django.db import models
 from django.contrib.auth.models import User
 from PIL import Image
@@ -19,8 +20,8 @@ class Riddle(models.Model):
     question = models.TextField()
     answer = models.CharField(max_length=50)
     clue = models.CharField(max_length=50)
-    photo_url = models.URLField()
-    song_url = models.URLField()
+    photo = models.CharField(max_length=200, default='default_value')  # Añade un valor predeterminado    
+    song_url = models.CharField(max_length=200) 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):

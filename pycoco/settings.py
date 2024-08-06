@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os
 from pathlib import Path
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -124,7 +125,9 @@ USE_TZ = True
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # le estás diciendo a Django dónde buscar y servir los archivos multimedia (como imágenes, videos, archivos de usuario cargados, etc.). Por ejemplo, si cargas un archivo de imagen llamado perfil.jpg, este sería accesible en tu aplicación a través de la URL http://tu-domino.com/media/perfil.jpg,
 #  asumiendo que tu-domino.com es tu dominio de desarrollo o producción.
+
 MEDIA_URL = '/media/'
+# vaya por culo que no me deja ponergame/ la ruta de media
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # LOGIN_URL es la URL a la que se redirigirá a los usuarios si intentan acceder a una vista protegida sin haber iniciado sesión. Por ejemplo, si un usuario intenta acceder a la URL /admin/ y no ha iniciado sesión, Django lo redirigirá a la URL definida en LOGIN_URL.
 LOGIN_URL = 'login'
@@ -133,7 +136,19 @@ LOGIN_URL = 'login'
 # STATIC_URL es similar a MEDIA_URL, 
 # pero se utiliza para archivos estáticos como hojas de estilo CSS, archivos JavaScript, e imágenes 
 # que son utilizadas en la interfaz de tu aplicación web. Debes definir STATIC_URL para que Django pueda encontrar y servir estos archivos estáticos correctamente. Al igual que con MEDIA_URL, los archivos estáticos se pueden acceder a través de URLs como http://tu-domino.com/static/style.css.
+
+
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# STATICFILES_DIRS es una lista de directorios donde Django buscará archivos estáticos adicionales,
+# 
+
+
+
+
+ 
+
+
 
 
 # Default primary key field type

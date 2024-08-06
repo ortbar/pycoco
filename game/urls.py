@@ -9,15 +9,12 @@ urlpatterns = [
     path("", views.login, name="login"),
     path("register", views.register, name="register"),
     path("index", views.index, name="index"),   
-    path("game", views.game, name="game"),
     path("estadisticas", views.estadisticas, name="estadisticas"),
     path("logout", views.logout, name="logout"),
     path("profile", views.profile, name="profile"),
+    path('game/<int:game_id>/', views.game, name='game'),  
+      
     
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
-    
-    
-]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth.forms import AuthenticationForm
@@ -10,11 +10,15 @@ from django.contrib.auth.decorators import login_required
 
 from django.shortcuts import redirect
 from django.contrib.auth.models import User
+from .models import Game, Riddle, Match
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.forms import UserCreationForm
 from game.forms import UserProfileForm 
+from django.http import JsonResponse
 
 
 
@@ -94,6 +98,42 @@ def profile(request, *args, **kwargs):
         form = UserProfileForm(instance=profile)
 
     return render(request, "profile.html", {"form": form})
+
+
+# vista que muestra el primer acertijo en game.html
+@login_required
+def game(request,game_id):
+    game = get_object_or_404(Game, pk=game_id)
+    riddles = Riddle.objects.filter(game=game)
+    riddle = riddles[0]
+    return render(request, "game.html", {"riddle": riddle, "game": game})
+
+
+
+# vista que maneja la respuesta del usuario al acertijo
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
 
 
 
