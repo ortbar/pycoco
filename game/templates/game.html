@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static%}
+{% load static %}
 
 
 {% block title %}
@@ -8,28 +8,32 @@ Juego de Acertijos
 
 {% block content %}
 <div class="container">
-    <h1 class="titulo">{{riddle.question}}</h1>
+    <h1 class="titulo">Juego de Acertijos</h1>
     
-    {% if riddle %}
+    {% for riddle in riddles %}
     <div class="acertijo">
-        imagenes del acertijo
-        {% load static %}
-        <img src="{% static 'images/kamaron.webp' %}" alt="imagen1">  
-        <img src="{% static 'images/isla.jpg' %}" alt="imagen2">        
-    </div>
-    <p>{{riddle.clue}}</p>
-    {% comment %} formulario para escribir la respuesta  {% endcomment %}
-    <form action="">
-        {% csrf_token %}
-        <input type="text" name="answer" id="answer" placeholder="Escribe tu respuesta">
-        <input type="submit" value="Enviar">
+        <h2>{{ riddle.question }}</h2>
+        <div>
 
+            {% if riddle.photo_1 and riddle.photo_2 %}
 
-           
+            <img src="{{ riddle.photo_1.url }}" alt="Imagen 1 del acertijo">
+            <img src="{{ riddle.photo_2.url }}" alt="Imagen 2 del acertijo">
+
+            {% else %}
+
+            <img src="{{ riddle.photo.url }}" alt="Imagen del acertijo">
+
+            {% endif %}
             
-    {% endif %}
-
-    {%endblock %}
-        </div>
+                    {% comment %} <p>{{ riddle.clue }}</p> {% endcomment %}
+        {% comment %} formulario para escribir la respuesta  {% endcomment %}
+        <form action="" method="post">
+            {% csrf_token %}
+            <input type="text" name="answer" id="answer" placeholder="Escribe tu respuesta">
+            <input type="submit" value="Enviar">
+        </form>
     </div>
-
+    {% endfor %}
+</div>
+{% endblock %}

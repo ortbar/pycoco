@@ -102,11 +102,10 @@ def profile(request, *args, **kwargs):
 
 # vista que muestra el primer acertijo en game.html
 @login_required
-def game(request,game_id):
+def game(request, game_id):
     game = get_object_or_404(Game, pk=game_id)
     riddles = Riddle.objects.filter(game=game)
-    riddle = riddles[0]
-    return render(request, "game.html", {"riddle": riddle, "game": game})
+    return render(request, "game.html", {"riddles": riddles, "game": game})
 
 
 

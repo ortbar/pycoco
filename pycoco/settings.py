@@ -139,9 +139,12 @@ LOGIN_URL = 'login'
 
 
 STATIC_URL = 'static/'
+# STATIC_ROOT es la ubicación en la que Django almacenará los archivos estáticos recopilados.
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
 # STATICFILES_DIRS es una lista de directorios donde Django buscará archivos estáticos adicionales,
 # 
+
 
 
 

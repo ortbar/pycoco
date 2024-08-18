@@ -20,7 +20,9 @@ class Riddle(models.Model):
     question = models.TextField()
     answer = models.CharField(max_length=50)
     clue = models.CharField(max_length=50)
-    photo = models.CharField(max_length=200, default='default_value')  # Añade un valor predeterminado    
+    photo = models.ImageField( upload_to='img', null=True, blank=True) # Añade un valor predeterminado    
+    photo_1 = models.ImageField( upload_to='img', null=True, blank=True) # Añade un valor predeterminado
+    photo_2 = models.ImageField( upload_to='img', null=True, blank=True) # Añade un valor predeterminado
     song_url = models.CharField(max_length=200) 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
