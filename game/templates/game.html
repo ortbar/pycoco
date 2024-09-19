@@ -15,14 +15,17 @@ Juego de Acertijos
         <h2>{{ riddle.question }}</h2>
         <div>
 
-            {% if riddle.photo_1 and riddle.photo_2 %}
+            {% if riddle.photo and riddle.photo_1 and riddle.photo_2 %}
 
             <img src="{{ riddle.photo_1.url }}" alt="Imagen 1 del acertijo">
             <img src="{{ riddle.photo_2.url }}" alt="Imagen 2 del acertijo">
+            <img src="{{ riddle.photo_3.url }}" alt="Imagen 3 del acertijo">
+
 
             {% else %}
 
             <img src="{{ riddle.photo.url }}" alt="Imagen del acertijo">
+            <img src="{{ riddle.photo_1.url }}" alt="Imagen 2 del acertijo">
 
             {% endif %}
             
