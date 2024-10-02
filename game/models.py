@@ -32,12 +32,16 @@ class Riddle(models.Model):
 class Match(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    points = models.IntegerField()
+    # inicializar los puntuacion de la partida a cero
+    points = models.IntegerField(default=0)
+    # atributo del modelo match que almacena los acertijos ya vistos
+    acertijos_vistos = models.JSONField(default=list, blank=True)
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
-        return self.game.name
-    
+        return f"user.user_name - self.game.name"
+
 class userProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     avatar = models.ImageField( upload_to='profile_pics')

@@ -1,42 +1,60 @@
 {% extends "base.html" %}
 {% load static %}
 
-
 {% block title %}
 Juego de Acertijos
 {% endblock %}
 
+{% block javascript %}
+    <script src={% static "game.js" %}></script>
+{% endblock %}
+
 {% block content %}
 <div class="container">
-    <h1 class="titulo">Juego de Acertijos</h1>
+    <h1 class="titulo text-center my-4">Juego de Acertijos</h1>
     
     {% for riddle in riddles %}
-    <div class="acertijo">
-        <h2>{{ riddle.question }}</h2>
-        <div>
+    <div class="acertijo mb-4 p-4 border rounded">
+        <h2 class="mb-3">{{ riddle.question }}</h2>
 
+        <div class="row">
             {% if riddle.photo and riddle.photo_1 and riddle.photo_2 %}
-
-            <img src="{{ riddle.photo_1.url }}" alt="Imagen 1 del acertijo">
-            <img src="{{ riddle.photo_2.url }}" alt="Imagen 2 del acertijo">
-            <img src="{{ riddle.photo_3.url }}" alt="Imagen 3 del acertijo">
-
-
+                <div class="col-4">
+                    <img src="{{ riddle.photo_1.url }}" alt="Imagen 1 del acertijo" class="img-fluid">
+                </div>
+                <div class="col-4">
+                    <img src="{{ riddle.photo_2.url }}" alt="Imagen 2 del acertijo" class="img-fluid">
+                </div>
+                <div class="col-4">
+                    <img src="{{ riddle.photo_3.url }}" alt="Imagen 3 del acertijo" class="img-fluid">
+                </div>
             {% else %}
-
-            <img src="{{ riddle.photo.url }}" alt="Imagen del acertijo">
-            <img src="{{ riddle.photo_1.url }}" alt="Imagen 2 del acertijo">
-
+                <div class="col-6">
+                    <img src="{{ riddle.photo.url }}" alt="Imagen del acertijo" class="img-fluid">
+                </div>
+                <div class="col-6">
+                    <img src="{{ riddle.photo_1.url }}" alt="Imagen 2 del acertijo" class="img-fluid">
+                </div>
             {% endif %}
-            
-                    {% comment %} <p>{{ riddle.clue }}</p> {% endcomment %}
-        {% comment %} formulario para escribir la respuesta  {% endcomment %}
-        <form action="" method="post">
-            {% csrf_token %}
-            <input type="text" name="answer" id="answer" placeholder="Escribe tu respuesta">
-            <input type="submit" value="Enviar">
-        </form>
+        </div>
+
+        <div class="mt-3">
+            <form action="" method="post">
+                {% csrf_token %}
+                <div class="input-group mb-3">
+                    <input type="text" name="answer" id="answer" class="form-control" placeholder="Escribe tu respuesta">
+                    <button class="btn btn-primary" type="submit">Enviar</button>
+                </div>
+            </form>
+
+            <button class="btn btn-secondary" onclick="mostrarPista({{ riddle.id }})">Mostrar pista</button>
+            <p id="pista-{{ riddle.id }}" class="pista mt-2" style="display:none;">{{ riddle.clue }}</p>
+        </div>
     </div>
     {% endfor %}
 </div>
+{% endblock %}
+
+{% block extra_js %}
+
 {% endblock %}

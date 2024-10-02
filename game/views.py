@@ -73,8 +73,41 @@ def logout(request):
         return redirect("/")
 
 @login_required   
-def game(request):
-    return render(request, "game.html")
+def game(request, game_id):
+    user = request.user
+    # crear match (y guardarlo en la base de datos) y pasarlo por el return para saber el id e ir actualizando los puntos
+    # y empezar con la lista de indices de los acertijos
+    game = get_object_or_404(Game, id= game_id)
+
+    # Verificar si ya existe un match para este usuario y juego
+    match, created = Match.objects.get_or_create(user=user, game=game)
+        # Si el match es nuevo, se inicializa los puntos y la lista de acertijos vistos
+    if created:
+        match.points = 0  # Inicializamos los puntos en cero
+        match.acertijos_vistos = []  # Creamos una lista vacía para los acertijos vistos
+        match.save()  # Guardamos el nuevo match en la base de datos
+
+        # filtrar acertijos que no se han visto
+        riddles = Riddle.objects.filter(game=game).exclude(id__in=match.acertijos_vistos)
+
+        # Si el usuario resuelve un acertijo correctamente, añadirlo a seen_riddles
+        if request.method == "POST":
+            riddle_id = int(request.POST.get('riddle_id'))
+            if riddle_id not in match.seen_riddles:
+                match.acertijos_vistos(riddle_id)  # Añadimos el ID del acertijo visto
+                match.save()  # Guardamos el Match actualizado en la base de datos
+
+        context = {
+        'match': match,
+        'game': game,
+        'riddles': riddles,
+        }
+        
+        return render(request, "game.html")
+
+## crear un metodo que sea para el boton de next que le pases el id del match actual
+## para ver que acertijos lleva, actualizar puntos y vigilar el fin de partida. 
+## puede/debe de usar la misma template que la anterior, game.html
 
 @login_required
 def index(request):
