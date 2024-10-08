@@ -102,6 +102,15 @@ def game(request, game_id):
 ## para ver que acertijos lleva, actualizar puntos y vigilar el fin de partida. 
 ## puede/debe de usar la misma template que la anterior, game.html
 
+
+##¿Qué hace esta vista check_answer?:
+
+    ##1 Recibe una solicitud GET para obtener el siguiente acertijo.
+    ##2 Filtra los acertijos que no han sido vistos por el usuario.
+    ##3 Si encuentra un acertijo, lo envía en formato JSON.
+    ##4 Si no encuentra más acertijos, devuelve un mensaje de que el juego ha terminado.
+
+
 def check_answer(request, match_id):
     if request.method == 'POST':
         # Obtener la partida actual (Match)
@@ -139,6 +148,39 @@ def check_answer(request, match_id):
                 'points': match.points
             })
     return JsonResponse({'status': 'error'}, status=400)
+
+
+
+def next_riddle(request,match_id):
+    if request.method == 'GET':
+        # OBtener la partida actual
+        match = get_object_or_404(Match, id=match_id)
+        # Obtener el siguiente acertijo que no haya sido resuelto aún (se excluye el id del acertijo ya resuelto)
+        riddles = match.game.riddle_set.exclude(id__in=match.acertijos_vistos)
+
+        # se pregunta si exiten más acertijos,..., si sí se muestra el siguiente (No resuelto claro)
+        if riddles.exists():
+            riddle = riddles.first()  # El próximo acertijo no resuelto
+
+            # Enviar el siguiente acertijo como respuesta
+            return JsonResponse({
+                'status': 'next_riddle',
+                'question': riddle.question,
+                'photo': riddle.photo.url if riddle.photo else None,
+                'photo_1': riddle.photo_1.url if riddle.photo_1 else None,
+                'photo_2': riddle.photo_2.url if riddle.photo_2 else None
+            })
+        
+        # si no hay mas acertijos se envía
+        else:
+            return JsonResponse({
+                'status':'finished',
+                'message': 'Todos los acertijos completados!!!'          
+            })
+    return JsonResponse({'status': 'error'}, status=400)
+
+
+
 
 
 

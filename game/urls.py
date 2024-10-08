@@ -14,6 +14,7 @@ urlpatterns = [
     path("profile", views.profile, name="profile"),
     path('game/<int:game_id>/', views.game, name='game'),  
     path('check_answer/<int:match_id>/', views.check_answer, name='check_answer'),
+    path('next_riddle/<int:match_id>/', views.next_riddle, name='next_riddle'),  
       
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
