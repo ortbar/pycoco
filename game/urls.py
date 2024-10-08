@@ -13,6 +13,7 @@ urlpatterns = [
     path("logout", views.logout, name="logout"),
     path("profile", views.profile, name="profile"),
     path('game/<int:game_id>/', views.game, name='game'),  
+    path('check_answer/<int:match_id>/', views.check_answer, name='check_answer'),
       
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

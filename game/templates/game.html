@@ -5,56 +5,113 @@
 Juego de Acertijos
 {% endblock %}
 
-{% block javascript %}
-    <script src={% static "game.js" %}></script>
-{% endblock %}
-
 {% block content %}
 <div class="container">
     <h1 class="titulo text-center my-4">Juego de Acertijos</h1>
     
-    {% for riddle in riddles %}
-    <div class="acertijo mb-4 p-4 border rounded">
-        <h2 class="mb-3">{{ riddle.question }}</h2>
+    <div id="acertijo-container" class="acertijo mb-4 p-4 border rounded">
+        <h2 class="mb-3">{{ riddles.0.question }}</h2>
 
         <div class="row">
-            {% if riddle.photo and riddle.photo_1 and riddle.photo_2 %}
+            {% if riddles.0.photo %}
                 <div class="col-4">
-                    <img src="{{ riddle.photo_1.url }}" alt="Imagen 1 del acertijo" class="img-fluid">
+                    <img src="{{ riddles.0.photo.url }}" alt="Imagen 1 del acertijo" class="img-fluid">
                 </div>
+            {% endif %}
+            {% if riddles.0.photo_1 %}
                 <div class="col-4">
-                    <img src="{{ riddle.photo_2.url }}" alt="Imagen 2 del acertijo" class="img-fluid">
+                    <img src="{{ riddles.0.photo_1.url }}" alt="Imagen 2 del acertijo" class="img-fluid">
                 </div>
+            {% endif %}
+            {% if riddles.0.photo_2 %}
                 <div class="col-4">
-                    <img src="{{ riddle.photo_3.url }}" alt="Imagen 3 del acertijo" class="img-fluid">
-                </div>
-            {% else %}
-                <div class="col-6">
-                    <img src="{{ riddle.photo.url }}" alt="Imagen del acertijo" class="img-fluid">
-                </div>
-                <div class="col-6">
-                    <img src="{{ riddle.photo_1.url }}" alt="Imagen 2 del acertijo" class="img-fluid">
+                    <img src="{{ riddles.0.photo_2.url }}" alt="Imagen 3 del acertijo" class="img-fluid">
                 </div>
             {% endif %}
         </div>
 
+        <!-- Formulario para la respuesta -->
         <div class="mt-3">
-            <form action="" method="post">
+            <form id="respuesta-form">
                 {% csrf_token %}
-                <div class="input-group mb-3">
-                    <input type="text" name="answer" id="answer" class="form-control" placeholder="Escribe tu respuesta">
-                    <button class="btn btn-primary" type="submit">Enviar</button>
+                <div class="form-group">
+                    <label for="respuesta">Tu respuesta:</label>
+                    <input type="text" name="respuesta" id="respuesta" class="form-control" placeholder="Escribe tu respuesta aquí">
                 </div>
+                <button type="submit" class="btn btn-primary mt-2">Comprobar</button>
             </form>
 
-            <button class="btn btn-secondary" onclick="mostrarPista({{ riddle.id }})">Mostrar pista</button>
-            <p id="pista-{{ riddle.id }}" class="pista mt-2" style="display:none;">{{ riddle.clue }}</p>
+            <button id="next-button" class="btn btn-secondary mt-2" style="display:none;">Siguiente</button>
+
+            <!-- Mostrar el mensaje de correcto/incorrecto -->
+            <div id="mensaje" class="mt-3"></div>
         </div>
     </div>
-    {% endfor %}
+
+    <!-- Mostrar los puntos -->
+    <div id="puntos-container">
+        Puntos: {{ match.points }}
+    </div>
 </div>
 {% endblock %}
 
-{% block extra_js %}
 
+
+{% block javascript %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Seleccionamos el formulario de respuesta
+            const respuestaForm = document.querySelector('#respuesta-form');
+            
+            if (respuestaForm) {
+                respuestaForm.addEventListener('submit', function(event) {
+                    event.preventDefault();  // Evitar el envío normal del formulario
+        
+                    // Obtener la respuesta del input
+                    const respuesta = document.querySelector('#respuesta').value;
+        
+                    // Realizar la llamada AJAX para verificar la respuesta
+                    fetch(`/check_answer/{{ match_id }}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}',
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: new URLSearchParams({ 'respuesta': respuesta })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Obtener el div de mensaje donde se mostrará el resultado
+                        const mensaje = document.querySelector('#mensaje');
+        
+                        if (data.status === 'correct') {
+                            mensaje.textContent = data.message; // Mostrar mensaje de éxito
+        
+                            // Actualizar los puntos
+                            document.querySelector('#puntos-container').textContent = `Puntos: ${data.points}`;
+        
+                            // Reproducir la canción si está disponible
+                            if (data.song_url) {
+                                const audio = new Audio(data.song_url);
+                                audio.play();
+                            }
+        
+                            // Deshabilitar el campo de respuesta
+                            document.querySelector('#respuesta').disabled = true;
+        
+                            // Mostrar el botón de siguiente
+                            document.querySelector('#next-button').style.display = 'inline-block';
+                        } else if (data.status === 'incorrect') {
+                            mensaje.textContent = data.message; // Mostrar mensaje de error
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));  // Manejo de errores
+                });
+            }
+        });
+        
+        
+
+        
+    </script>
 {% endblock %}

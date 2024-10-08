@@ -23,8 +23,7 @@ class Riddle(models.Model):
     photo = models.ImageField( upload_to='img', null=True, blank=True) # Añade un valor predeterminado    
     photo_1 = models.ImageField( upload_to='img', null=True, blank=True) # Añade un valor predeterminado
     photo_2 = models.ImageField( upload_to='img', null=True, blank=True) # Añade un valor predeterminado
-    song_url = models.CharField(max_length=200) 
-    created_at = models.DateTimeField(auto_now_add=True)
+    song_file = models.FileField(upload_to='songs', null=True, blank=True)  # Cambiado de song_url a song_file    created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
         return self.question
