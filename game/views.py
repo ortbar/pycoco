@@ -129,7 +129,7 @@ def check_answer(request, match_id):
         # Comparar la respuesta
         if respuesta_usuario == riddle.answer.lower():
             # Si es correcta, aumentar los puntos y marcar acertijo como resuelto
-            match.points += 10
+            match.points += 10  # Puntos por respuesta correcta
             match.acertijos_vistos.append(riddle.id)
             match.save()
 
@@ -141,13 +141,23 @@ def check_answer(request, match_id):
                 'song_url': riddle.song_file.url if riddle.song_file else None
             })
         else:
-            # Si es incorrecta
+            # Si es incorrecta, restar 2 puntos
+            match.points -= 2
+                        # Aquí también marcamos el acertijo como visto
+            match.acertijos_vistos.append(riddle.id)
+            match.save()  # <-- Asegurarse de que se guarda
+
+           
+
+            # Enviar respuesta incorrecta y el estado actualizado de los puntos
             return JsonResponse({
                 'status': 'incorrect',
-                'message': 'Respuesta incorrecta. Intenta de nuevo.',
+                'message': 'Respuesta incorrecta. Se han restado 2 puntos.',
                 'points': match.points
             })
+
     return JsonResponse({'status': 'error'}, status=400)
+
 
 
 
