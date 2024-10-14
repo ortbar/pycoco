@@ -96,8 +96,9 @@ document.addEventListener("DOMContentLoaded", function() {
                     nextButton.style.display = 'none';
                 } else if (data.status === 'finished') {
                     // Si no hay más acertijos, mostrar mensaje de finalización
-                    document.querySelector('#mensaje').textContent = data.message;
+                    // document.querySelector('#mensaje').textContent = data.message;
                     nextButton.style.display = 'none';  // Ocultar el botón siguiente si se ha terminado
+                    document.querySelector('#mensaje').textContent = `${data.message}. ¡Has obtenido ${data.points} puntos!`;
                 }
             })
             .catch(error => console.error('Error:', error));

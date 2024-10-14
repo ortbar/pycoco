@@ -185,10 +185,10 @@ def next_riddle(request,match_id):
         else:
             return JsonResponse({
                 'status':'finished',
-                'message': 'Todos los acertijos completados!!!'          
+                'message': 'Todos los acertijos completados!!!',         
+                'points': match.points
             })
     return JsonResponse({'status': 'error'}, status=400)
-
 
 
 

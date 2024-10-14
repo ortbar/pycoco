@@ -6,7 +6,7 @@ Juego de Acertijos
 {% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container" id="container">
     <h1 class="titulo text-center my-4">Juego de Acertijos</h1>
     
     <div id="acertijo-container" class="acertijo mb-4 p-4 border rounded">
@@ -38,7 +38,7 @@ Juego de Acertijos
                     <label for="respuesta">Tu respuesta:</label>
                     <input type="text" name="respuesta" id="respuesta" class="form-control" placeholder="Escribe tu respuesta aquí">
                 </div>
-                <button type="submit" class="btn btn-primary mt-2">Comprobar</button>
+                <button type="submit"  class="btn btn-primary mt-2">Comprobar</button>
             </form>
 
             <button id="nextButton" class="btn btn-secondary mt-2" style="display:none;">Siguiente</button>
