@@ -182,13 +182,14 @@ def next_riddle(request,match_id):
             })
         
         # si no hay mas acertijos se envía
-        else:
-            return JsonResponse({
-                'status':'finished',
-                'message': 'Todos los acertijos completados!!!',         
-                'points': match.points
-            })
+    if not riddles.exists():
+        return JsonResponse({
+        'status': 'finished',
+        'message': '¡Has completado todos los acertijos!',
+        'points': match.points
+    })
     return JsonResponse({'status': 'error'}, status=400)
+
 
 
 
