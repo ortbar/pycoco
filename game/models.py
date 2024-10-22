@@ -35,7 +35,7 @@ class Match(models.Model):
     points = models.IntegerField(default=0)
     # atributo del modelo match que almacena los acertijos ya vistos
     acertijos_vistos = models.JSONField(default=list, blank=True)
-    
+    partida_acabada = models.BooleanField(default=False)    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):

@@ -79,12 +79,34 @@ def game(request, game_id):
     # obtener el juego
     game = get_object_or_404(Game, id=game_id)
     # crear match (y guardarlo en la base de datos) y pasarlo por el return para saber el id e ir actualizando los puntos
-     # Crear un nuevo Match cada vez que se inicie el juego
-    match = Match.objects.create(user=user, game=game, points=0, acertijos_vistos=[])
 
+    # match = Match.objects.get(user=user, game=game, partida_terminada=False)
+
+    # if (type(match) == list and len(match) > 1):
+    #     # Código para manejar el caso en que la lista de partidas sea mayor a 1
+    #     pass  # Reemplaza "pass" con el código que necesites ejecutar
+    #     dar error de que hay varias partidas inacabadas y borrarlas todas y reiniciar juego por ejemplo
+
+    # elif (type(match) == list and len(match) == 1):
+    #     match = match[0]
+    # else:
+    #     # Crear nueva partida
+    #     match = Match.objects.create(user=user, game=game, points=0, acertijos_vistos=[])
+
+
+    
+    # verificar si ya existe un Match no terminado para el usuario y el juego en curso.
+    #  Si existe, se cargará ese Match; de lo contrario, se creará uno nuevo
+    match = Match.objects.filter(user=user, game=game, partida_acabada=False).first()
+
+    if match:
+        # Si existe una partida no terminada, la usamos
+        pass
+    else:
+        match = Match.objects.create(user=user, game=game, points=0, acertijos_vistos=[])
+        
     # Filtrar acertijos que el usuario no ha visto aún (como es una nueva partida, todos los acertijos estarán disponibles)
-    riddles = Riddle.objects.filter(game=game)
-
+    riddles = Riddle.objects.filter(game=game).exclude(id__in=match.acertijos_vistos)
    
 
       # Preparar el contexto para la plantilla
@@ -121,11 +143,14 @@ def check_answer(request, match_id):
         if riddles.exists():
             riddle = riddles.first()  # El siguiente acertijo no resuelto
         else:
+            # si no hay más acertijos, marcamos la partida como acabada True 
+            match.partida_acabada = True
+            match.save
             return JsonResponse({'status': 'finished', 'message': '¡Has completado todos los acertijos!'})
 
-        # Obtener la respuesta del formulario
-        respuesta_usuario = request.POST.get('respuesta', '').strip().lower()
 
+        # Obtener la respuesta del formulario del usuario
+        respuesta_usuario = request.POST.get('respuesta', '').strip().lower()
         # Comparar la respuesta
         if respuesta_usuario == riddle.answer.lower():
             # Si es correcta, aumentar los puntos y marcar acertijo como resuelto
@@ -145,7 +170,7 @@ def check_answer(request, match_id):
             match.points -= 2
                         # Aquí también marcamos el acertijo como visto
             match.acertijos_vistos.append(riddle.id)
-            match.save()  # <-- Asegurarse de que se guarda
+            match.save()  # <-- guardar los cambios
 
            
 
@@ -181,13 +206,18 @@ def next_riddle(request,match_id):
                 'photo_2': riddle.photo_2.url if riddle.photo_2 else None
             })
         
-        # si no hay mas acertijos se envía
-    if not riddles.exists():
+        # si no hay mas acertijos se marca la partida como terminada
+    
+        match.partida_acabada = True
+        # y se guarda la partida
+        match.save()
+
         return JsonResponse({
         'status': 'finished',
         'message': '¡Has completado todos los acertijos!',
         'points': match.points
     })
+    
     return JsonResponse({'status': 'error'}, status=400)
 
 

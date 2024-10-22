@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
             const respuesta = document.querySelector('#respuesta').value;
 
+            // Hacer la solicitud para comprobar la respuesta
             fetch(`/check_answer/${match_id}/`, {
                 method: 'POST',
                 headers: {
@@ -24,7 +25,6 @@ document.addEventListener("DOMContentLoaded", function() {
                     mensaje.textContent = data.message;
 
                     // Actualizar puntos en pantalla
-                    console.log("Puntos recibidos (correct):", data.points);  // <-- Verificamos los puntos
                     document.querySelector('#puntos-container').textContent = `Puntos: ${data.points}`;
 
                     if (data.song_url) {
@@ -32,26 +32,27 @@ document.addEventListener("DOMContentLoaded", function() {
                         audio.play();
                     }
 
+                    // Deshabilitar el campo de respuesta hasta que se cargue el próximo acertijo
                     document.querySelector('#respuesta').disabled = true;
-                    document.querySelector('#nextButton').style.display = 'inline-block';
+                    nextButton.style.display = 'inline-block'; // Mostrar el botón "Siguiente"
                 } else if (data.status === 'incorrect') {
                     mensaje.textContent = data.message;
 
-                    // Asegurarse de que el contenedor de puntos se actualice correctamente
-                    console.log("Puntos recibidos (incorrect):", data.points);  // <-- Verificamos los puntos
+                    // Actualizar puntos en pantalla
                     document.querySelector('#puntos-container').textContent = `Puntos: ${data.points}`;
 
-                    // Mostrar el botón de siguiente
-                    document.querySelector('#nextButton').style.display = 'inline-block';
+                    // Mostrar el botón "Siguiente" para intentar un nuevo acertijo
+                    nextButton.style.display = 'inline-block';
                 }
             })
-            .catch(error => console.error('Error:', error));  // Manejo de errores
+            .catch(error => console.error('Error:', error)); // Manejo de errores
         });
     }
 
-    // Evento para el botón "Siguiente"
+    // Manejo del evento del botón "Siguiente"
     if (nextButton) {
         nextButton.addEventListener('click', function() {
+            // Hacer la solicitud para obtener el siguiente acertijo
             fetch(`/next_riddle/${match_id}/`, {
                 method: 'GET',
             })
@@ -95,13 +96,18 @@ document.addEventListener("DOMContentLoaded", function() {
                     // Ocultar el botón "Siguiente"
                     nextButton.style.display = 'none';
                 } else if (data.status === 'finished') {
-                    // Si no hay más acertijos, mostrar mensaje de finalización
-                    // document.querySelector('#mensaje').textContent = data.message;
-                    nextButton.style.display = 'none';  // Ocultar el botón siguiente si se ha terminado
-                    document.querySelector('#mensaje').textContent = `${data.message}. ¡Has obtenido ${data.points} puntos!`;
+                    // Mostrar mensaje de finalización y puntaje final
+                    const acertijoContainer = document.querySelector('#acertijo-container');
+                    acertijoContainer.innerHTML = `
+                        <div class="text-center">
+                            <h3>¡Has completado todos los acertijos!</h3>
+                            <p>Tu puntuación final es: ${data.points}</p>
+                        </div>
+                    `;
+                    nextButton.style.display = 'none'; // Ocultar el botón "Siguiente"
                 }
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => console.error('Error:', error)); // Manejo de errores
         });
     }
 });
