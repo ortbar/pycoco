@@ -9,26 +9,26 @@ Juego de Acertijos
 <div class="container" id="container">
     <h1 class="titulo text-center my-4">Juego de Acertijos</h1>
     <div id="acertijo-container" class="acertijo mb-4 p-4 border rounded">
-        {% if riddles %}
-            <h2 class="mb-3">{{ riddles.0.question }}</h2>
+        {% if match.acertijo_corriente %}
+            <h2 class="mb-3">{{ match.acertijo_corriente.question }}</h2>
 
             <div class="row" id="row">
-                {% if riddles.0.photo %}
+                {% if match.acertijo_corriente.photo %}
                     <div class="col-4">
-                        <img src="{{ riddles.0.photo.url }}" alt="Imagen 1 del acertijo" class="img-fluid">
+                        <img src="{{ match.acertijo_corriente.photo.url }}" alt="Imagen 1 del acertijo" class="img-fluid">
                     </div>
                 {% endif %}
-                {% if riddles.0.photo_1 %}
+                {% if match.acertijo_corriente.photo_1 %}
                     <div class="col-4">
-                        <img src="{{ riddles.0.photo_1.url }}" alt="Imagen 2 del acertijo" class="img-fluid">
+                        <img src="{{ match.acertijo_corriente.photo_1.url }}" alt="Imagen 2 del acertijo" class="img-fluid">
                     </div>
                 {% endif %}
-                {% if riddles.0.photo_2 %}
+                {% if match.acertijo_corriente.photo_2 %}
                     <div class="col-4">
-                        <img src="{{ riddles.0.photo_2.url }}" alt="Imagen 3 del acertijo" class="img-fluid">
-                     </div>
+                        <img src="{{ match.acertijo_corriente.photo_2.url }}" alt="Imagen 3 del acertijo" class="img-fluid">
+                    </div>
                 {% endif %}
-             </div>
+            </div>
 
             <!-- Formulario para la respuesta -->
             <div class="mt-3">
@@ -38,12 +38,11 @@ Juego de Acertijos
                         <label for="respuesta">Tu respuesta:</label>
                         <input type="text" name="respuesta" id="respuesta" class="form-control" placeholder="Escribe tu respuesta aquí">
                     </div>
-                    <button type="submit"  class="btn btn-primary mt-2">Comprobar</button>
+                    <button type="submit" class="btn btn-primary mt-2">Comprobar</button>
                 </form>
 
-                <button id="nextButton" class="btn btn-secondary mt-2" style="display:none;">Siguiente</button>
-
-            <!-- Mostrar el mensaje de correcto/incorrecto -->
+                <button id="nextButton" class="btn btn-secondary mt-2" style="{% if not match.acertijo_resuelto %}display:none;{% endif %}">Siguiente</button>
+                <!-- Mostrar el mensaje de correcto/incorrecto -->
                 <div id="mensaje" class="mt-3"></div>
             </div>
         {% else %}
@@ -51,9 +50,8 @@ Juego de Acertijos
                 <h3>¡Has completado todos los acertijos!</h3>
                 <p>Tu puntuación final es: {{ match.points }}</p>
             </div>
-        {% endif%}
+        {% endif %}
     </div>
-
 
     <!-- Mostrar los puntos -->
     <div id="puntos-container">
@@ -61,8 +59,6 @@ Juego de Acertijos
     </div>
 </div>
 {% endblock %}
-
-
 
 {% block javascript %}
     <script src="{% static 'game.js' %}"></script>

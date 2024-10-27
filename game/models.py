@@ -35,6 +35,9 @@ class Match(models.Model):
     points = models.IntegerField(default=0)
     # atributo del modelo match que almacena los acertijos ya vistos
     acertijos_vistos = models.JSONField(default=list, blank=True)
+    acertijo_corriente = models.ForeignKey(Riddle, null=True, blank=True, on_delete=models.SET_NULL, related_name='matches')
+    acertijo_resuelto = models.BooleanField(default=False)
+
     partida_acabada = models.BooleanField(default=False)    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

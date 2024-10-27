@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
     const respuestaForm = document.querySelector('#respuesta-form');
-    const nextButton = document.querySelector('#nextButton');  
+    const nextButton = document.querySelector('#nextButton');
     
     if (respuestaForm) {
         respuestaForm.addEventListener('submit', function(event) {
@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
                 body: new URLSearchParams({ 'respuesta': respuesta })
+                
             })
             .then(response => response.json())
             .then(data => {
@@ -40,9 +41,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
                     // Actualizar puntos en pantalla
                     document.querySelector('#puntos-container').textContent = `Puntos: ${data.points}`;
-
-                    // Mostrar el botón "Siguiente" para intentar un nuevo acertijo
-                    nextButton.style.display = 'inline-block';
                 }
             })
             .catch(error => console.error('Error:', error)); // Manejo de errores

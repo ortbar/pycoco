@@ -95,26 +95,34 @@ def game(request, game_id):
 
 
     
-    # verificar si ya existe un Match no terminado para el usuario y el juego en curso.
-    #  Si existe, se cargará ese Match; de lo contrario, se creará uno nuevo
+   
+    #  Buscar una partida no terminada para el usuario y el juego en curso 
     match = Match.objects.filter(user=user, game=game, partida_acabada=False).first()
 
-    if match:
-        # Si existe una partida no terminada, la usamos
-        pass
-    else:
+     # si no existe una partida no terminada, crear una nueva
+    if not match:
         match = Match.objects.create(user=user, game=game, points=0, acertijos_vistos=[])
-        
-    # Filtrar acertijos que el usuario no ha visto aún (como es una nueva partida, todos los acertijos estarán disponibles)
-    riddles = Riddle.objects.filter(game=game).exclude(id__in=match.acertijos_vistos)
+
+    # Verificar si hay un acertijo en curso, si no, seleccionar el siguiente disponible
+    if not match.acertijo_corriente and not match.partida_acabada:
+    # Obtener el siguiente acertijo no visto        
+        riddles = Riddle.objects.filter(game=game).exclude(id__in=match.acertijos_vistos)
+        if riddles.exists():
+            match.acertijo_corriente = riddles.first() # seleccionar el primer acertijo no visto
+            match.acertijo_resuelto = False
+            match.save()
+        else:
+            match.partida_acabada = True
+            match.save() 
    
 
       # Preparar el contexto para la plantilla
     context = {
         'game': game,
-        'match': match, 
-        'riddles': riddles,  # Pasar todos los acertijos disponibles 
-        'match_id': match.id
+        'match_id': match.id,
+        'match': match,  
+        'riddle': match.acertijo_corriente, # pasar el acertijo corriente a la plantilla
+        'acertijo_resuelto': match.acertijo_resuelto # pasar el estado de si el acertijo ha sido resuelto
     }
     
     # Pasar el match para que esté disponible en el template
@@ -138,27 +146,25 @@ def check_answer(request, match_id):
         # Obtener la partida actual (Match)
         match = get_object_or_404(Match, id=match_id)
 
-        # Obtener el acertijo actual basado en los que aún no ha visto
-        riddles = match.game.riddle_set.exclude(id__in=match.acertijos_vistos)
-        if riddles.exists():
-            riddle = riddles.first()  # El siguiente acertijo no resuelto
-        else:
-            # si no hay más acertijos, marcamos la partida como acabada True 
-            match.partida_acabada = True
-            match.save
-            return JsonResponse({'status': 'finished', 'message': '¡Has completado todos los acertijos!'})
-
-
-        # Obtener la respuesta del formulario del usuario
+        # Verificar si hay un acertijo corriente y que la partida no esté terminada
+        riddle = match.acertijo_corriente
+        if not riddle or match.partida_acabada:
+            return JsonResponse({'status': 'error', 'message': 'No hay acertijo activo o la partida ha finalizado.'})
+        
+        # Obtener la respuesta del usuario
         respuesta_usuario = request.POST.get('respuesta', '').strip().lower()
-        # Comparar la respuesta
-        if respuesta_usuario == riddle.answer.lower():
-            # Si es correcta, aumentar los puntos y marcar acertijo como resuelto
-            match.points += 10  # Puntos por respuesta correcta
+        respuesta_correcta = riddle.answer.strip().lower()
+
+        # Verificar si la respuesta es correcta
+        if respuesta_usuario == respuesta_correcta:
+            # Aumentar los puntos y marcar el acertijo como resuelto
+            match.points += 10
             match.acertijos_vistos.append(riddle.id)
+            match.acertijo_resuelto = True  # Marcar como resuelto
+            # Guardar el estado de la partida sin avanzar al siguiente acertijo
             match.save()
 
-            # Enviar respuesta correcta y la canción asociada
+            # Responder con éxito y reproducir la canción
             return JsonResponse({
                 'status': 'correct',
                 'message': '¡Respuesta correcta!',
@@ -166,59 +172,81 @@ def check_answer(request, match_id):
                 'song_url': riddle.song_file.url if riddle.song_file else None
             })
         else:
-            # Si es incorrecta, restar 2 puntos
+            # Si la respuesta es incorrecta, restar puntos y mantener el acertijo actual
             match.points -= 2
-                        # Aquí también marcamos el acertijo como visto
-            match.acertijos_vistos.append(riddle.id)
-            match.save()  # <-- guardar los cambios
+            match.save()  # Guardar los cambios
 
-           
-
-            # Enviar respuesta incorrecta y el estado actualizado de los puntos
+            # Responder con error
             return JsonResponse({
                 'status': 'incorrect',
-                'message': 'Respuesta incorrecta. Se han restado 2 puntos.',
+                'message': 'Respuesta incorrecta. Se han restado 2 puntos. Inténtalo de nuevo.',
                 'points': match.points
             })
 
-    return JsonResponse({'status': 'error'}, status=400)
+    # Respuesta en caso de que no sea un método POST
+    return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=400)
 
 
 
 
-def next_riddle(request,match_id):
+
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+
+def next_riddle(request, match_id):
     if request.method == 'GET':
-        # OBtener la partida actual
+        # Obtener la partida actual (Match)
         match = get_object_or_404(Match, id=match_id)
-        # Obtener el siguiente acertijo que no haya sido resuelto aún (se excluye el id del acertijo ya resuelto)
-        riddles = match.game.riddle_set.exclude(id__in=match.acertijos_vistos)
 
-        # se pregunta si exiten más acertijos,..., si sí se muestra el siguiente (No resuelto claro)
-        if riddles.exists():
-            riddle = riddles.first()  # El próximo acertijo no resuelto
+        # Verificar si la partida ya ha terminado
+        if match.partida_acabada:
+            return JsonResponse({'status': 'finished', 'points': match.points})
 
-            # Enviar el siguiente acertijo como respuesta
+        # Verificar si el acertijo actual está resuelto
+        if not match.acertijo_resuelto:
+            return JsonResponse({'status': 'error', 'message': 'El acertijo actual no ha sido resuelto.'})
+
+        # Buscar el siguiente acertijo no resuelto
+        siguiente_acertijo = Riddle.objects.filter(
+            game=match.game
+        ).exclude(id__in=match.acertijos_vistos).first()  # Utilizar first() para obtener un solo objeto Riddle
+
+        # Verificar si se encontró un siguiente acertijo
+        if siguiente_acertijo:
+            # Actualizar el acertijo corriente y el estado de resuelto
+            match.acertijo_corriente = siguiente_acertijo
+            match.acertijo_resuelto = False
+            match.save()
+
+            # Responder con los detalles del siguiente acertijo
             return JsonResponse({
                 'status': 'next_riddle',
-                'question': riddle.question,
-                'photo': riddle.photo.url if riddle.photo else None,
-                'photo_1': riddle.photo_1.url if riddle.photo_1 else None,
-                'photo_2': riddle.photo_2.url if riddle.photo_2 else None
+                'question': siguiente_acertijo.question,
+                'photo': siguiente_acertijo.photo.url if siguiente_acertijo.photo else None,
+                'photo_1': siguiente_acertijo.photo_1.url if siguiente_acertijo.photo_1 else None,
+                'photo_2': siguiente_acertijo.photo_2.url if siguiente_acertijo.photo_2 else None,
+                'points': match.points
             })
+        else:
+            # Si no hay más acertijos, marcar la partida como finalizada
+            match.acertijo_corriente = None
+            match.partida_acabada = True
+            match.save()
+
+            # Responder con el estado de finalización
+            return JsonResponse({'status': 'finished', 'points': match.points})
+
+    # Respuesta en caso de que no sea un método GET
+    return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=400)
+
+
+
         
         # si no hay mas acertijos se marca la partida como terminada
-    
-        match.partida_acabada = True
-        # y se guarda la partida
-        match.save()
 
-        return JsonResponse({
-        'status': 'finished',
-        'message': '¡Has completado todos los acertijos!',
-        'points': match.points
-    })
-    
-    return JsonResponse({'status': 'error'}, status=400)
+
+
+
 
 
 
